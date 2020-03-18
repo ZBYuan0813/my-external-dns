@@ -146,7 +146,8 @@ type AWSConfig struct {
 
 // NewAWSProvider initializes a new AWS Route53 based Provider.
 func NewAWSProvider(awsConfig AWSConfig) (*AWSProvider, error) {
-	config := aws.NewConfig().WithMaxRetries(awsConfig.APIRetries)
+
+	config := aws.NewConfig().WithMaxRetries(awsConfig.APIRetries).WithEndpoint(awsConfig.EndpointUrl)
 
 	config.WithHTTPClient(
 		instrumented_http.NewClient(config.HTTPClient, &instrumented_http.Callbacks{
