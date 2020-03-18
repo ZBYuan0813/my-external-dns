@@ -162,14 +162,18 @@ func NewAWSProvider(awsConfig AWSConfig) (*AWSProvider, error) {
 		Config:            *config,
 		SharedConfigState: session.SharedConfigEnable,
 	})
+	log.Infof("Newdriver config content: %s",config.Endpoint)
 	if err != nil {
 		return nil, err
 	}
 
+	log.Infof("The first session of endpoint: %s",session.Config.Endpoint)
 	if awsConfig.AssumeRole != "" {
 		log.Infof("Assuming role: %s", awsConfig.AssumeRole)
-		session.Config.WithCredentials(stscreds.NewCredentials(session, awsConfig.AssumeRole))
+		session.Config.WithCredentials(stscreds.NewCredentials(session, awsConfig.AssumeRole)).WithEndpoint(awsConfig.EndpointUrl)
 	}
+
+
 
 	provider := &AWSProvider{
 		client:               route53.New(session),
@@ -182,7 +186,7 @@ func NewAWSProvider(awsConfig AWSConfig) (*AWSProvider, error) {
 		evaluateTargetHealth: awsConfig.EvaluateTargetHealth,
 		preferCNAME:          awsConfig.PreferCNAME,
 		dryRun:               awsConfig.DryRun,
-		endpointUrl:          awsConfig.EndpointUrl,
+		endpointUrl:          *config.Endpoint,
 	}
 
 	return provider, nil
@@ -430,6 +434,7 @@ func (p *AWSProvider) submitChanges(ctx context.Context, changes []*route53.Chan
 					},
 				}
 
+				log.Infof("ERROR endpoint: %s", p.endpointUrl)
 				if _, err := p.client.ChangeResourceRecordSetsWithContext(ctx, params); err != nil {
 					log.Errorf("Failure in zone %s [Id: %s]", aws.StringValue(zones[z].Name), z)
 					log.Error(err) //TODO(ideahitme): consider changing the interface in cases when this error might be a concern for other components
