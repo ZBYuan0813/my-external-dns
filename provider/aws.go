@@ -435,9 +435,10 @@ func (p *AWSProvider) submitChanges(ctx context.Context, changes []*route53.Chan
 
 				log.Infof("HostedZoneID: %s", params.HostedZoneId)
 				log.Infof("Endpoint url: %s", p.endpointUrl)
+				
 
 				mySession := session.Must(session.NewSession())
-				svc := route53.New(mySession, aws.NewConfig().WithEndpoint(p.endpointUrl))
+				svc := route53.New(mySession, aws.NewConfig().WithRegion("cn-northwest-1").WithEndpoint(p.endpointUrl))
 				if _, err := svc.ChangeResourceRecordSetsWithContext(ctx,params); err != nil{
 					log.Errorf("Failure in zone %s [Id: %s]", aws.StringValue(zones[z].Name), z)
 					log.Error(err)
