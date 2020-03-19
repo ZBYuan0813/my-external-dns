@@ -435,7 +435,7 @@ func (p *AWSProvider) submitChanges(ctx context.Context, changes []*route53.Chan
 
 				log.Infof("HostedZoneID: %s", params.HostedZoneId)
 				log.Infof("Endpoint url: %s", p.endpointUrl)
-				
+
 
 				mySession := session.Must(session.NewSession())
 				svc := route53.New(mySession, aws.NewConfig().WithRegion("cn-northwest-1").WithEndpoint(p.endpointUrl))
